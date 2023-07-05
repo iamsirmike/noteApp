@@ -11,6 +11,10 @@ A new Flutter project.
 ## Running integration test
 `flutter test integration_test`
 
+## Stack
+1. Mobile - Flutter
+2. DB - Hive
+
 ## Features
 1. Add note
 2. Edit note
@@ -20,6 +24,7 @@ A new Flutter project.
 ## Limitations
 1. Note background color can blend into the app background color since I am generating the colors dynamically
 2. Can't sync with any remote database
+3. No special document editing tools.
 
 ## Screenshot
 <div align="center">
@@ -31,13 +36,3 @@ A new Flutter project.
     <img src="/screenshots/searchnote.png" width="300px" height="650" /> 
     <img src="/screenshots/emptysearch.png" width="300px" height="650" /> 
 </div>
-
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
