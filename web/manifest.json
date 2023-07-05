@@ -1,6 +1,6 @@
 {
-    "name": "flutter_boilerplate_mvvm_pattern",
-    "short_name": "flutter_boilerplate_mvvm_pattern",
+    "name": "note_app",
+    "short_name": "note_app",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
