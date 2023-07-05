@@ -1,10 +1,22 @@
-# flutter_boilerplate_mvvm_pattern
+# NOTE TAKING APP
 
 A new Flutter project.
 
 ## Getting Started
 
-This project is a starting point for a Flutter application.
+1. Clone the project
+2. run `flutter pub get`
+3. run `flutter pub run build_runner build --delete-conflicting-outputs`
+
+# Running integration test
+`flutter test integration_test`
+
+# Features
+1. Add note
+2. Edit note
+3. Delete not (by swiping a note to the left)
+4. Search for notes using the title or any keyword
+
 
 A few resources to get you started if this is your first Flutter project:
 
