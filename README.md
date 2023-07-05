@@ -11,6 +11,10 @@ A new Flutter project.
 ## Running integration test
 `flutter test integration_test`
 
+## Stack
+1. Mobile - Flutter
+2. DB - Hive
+
 ## Features
 1. Add note
 2. Edit note
