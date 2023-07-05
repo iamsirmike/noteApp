@@ -25,7 +25,7 @@ A new Flutter project.
     <img src="/screenshots/notes.png" width="300px" height="650" /> 
     <img src="/screenshots/viewnote.png" width="300px" height="650" /> 
     <img src="/screenshots/searchnote.png" width="300px" height="650" /> 
-    <img src="/screenshots/emptysearchnote.png" width="300px" height="650" /> 
+    <img src="/screenshots/emptysearch.png" width="300px" height="650" /> 
 </div>
 
 
