@@ -27,7 +27,6 @@ abstract class OperationRunnerState<T extends StatefulWidget> extends State<T> {
     } catch (e) {
       if (showLoader) context.loaderOverlay.hide();
 
-      print(e.toString());
     }
 
     return null;
