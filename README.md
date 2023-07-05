@@ -14,8 +14,12 @@ A new Flutter project.
 ## Features
 1. Add note
 2. Edit note
-3. Delete not (by swiping a note to the left)
+3. Swipe to delete
 4. Search for notes using the title or any keyword
+
+## Limitations
+1. Note background color can blend into the app background color since I am generating the colors dynamically
+2. Can't sync with any remote database
 
 ## Screenshot
 <div align="center">
