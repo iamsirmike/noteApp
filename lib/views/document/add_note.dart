@@ -6,8 +6,8 @@ import 'package:kngtakehome/core/viewmodels/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
 import 'package:kngtakehome/utils/operation_runner.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
-import 'package:kngtakehome/views/widgets/KngTextField.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
+import 'package:kngtakehome/views/widgets/custom_textfield.dart';
 import 'package:kngtakehome/views/widgets/dialog/confirm_alert.dialog.dart';
 import 'package:provider/provider.dart';
 
@@ -142,7 +142,7 @@ class _AddNoteState extends OperationRunnerState<AddNote> {
                       const SizedBox(
                         height: 20,
                       ),
-                      KngTextField(
+                      CustomTextField(
                         key: const Key('titleTextField'),
                         hint: 'Title',
                         isRequired: true,
@@ -170,7 +170,7 @@ class _AddNoteState extends OperationRunnerState<AddNote> {
                           });
                         },
                       ),
-                      KngTextField(
+                      CustomTextField(
                         key: const Key('contentTextField'),
                         hint: 'Type something...',
                         isRequired: false,

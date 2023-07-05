@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:kngtakehome/views/home/widgets/input_decoration.dart';
 
-class KngTextField extends StatelessWidget {
-  const KngTextField({
+class CustomTextField extends StatelessWidget {
+  const CustomTextField({
     super.key,
     this.filled = false,
     this.isRequired = true,

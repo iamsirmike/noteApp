@@ -9,7 +9,7 @@ import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
 import 'package:kngtakehome/views/home/widgets/empty_state.dart';
 import 'package:kngtakehome/views/home/widgets/note_container.dart';
 import 'package:kngtakehome/views/home/widgets/swipe_to_delete_bg.dart';
-import 'package:kngtakehome/views/widgets/KngTextField.dart';
+import 'package:kngtakehome/views/widgets/custom_textfield.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
 import 'package:provider/provider.dart';
 
@@ -38,7 +38,7 @@ class _MyHomePageState extends OperationRunnerState<MyHomePage> with DidBuild {
           if (showSearchBar) ...[
             Padding(
                 padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
-                child: KngTextField(
+                child: CustomTextField(
                   controller: _searchController,
                   hint: 'Search by the keyword...',
                   filled: true,
