@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
 import 'package:kngtakehome/core/repository/note_repository.dart';
 
@@ -58,3 +59,10 @@ class NoteViewModel extends ChangeNotifier {
     await getNotes();
   }
 }
+
+
+final noteViewModel = ChangeNotifierProvider<NoteViewModel>((ref) {
+  return NoteViewModel(
+    noteRepositoryImpl: ref.read(noteRepositoryImplProvider),
+  );
+});

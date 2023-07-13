@@ -1,29 +1,27 @@
 // ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
 import 'package:kngtakehome/core/viewmodels/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
-import 'package:kngtakehome/utils/operation_runner.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
 import 'package:kngtakehome/views/widgets/custom_textfield.dart';
 import 'package:kngtakehome/views/widgets/dialog/confirm_alert.dialog.dart';
-import 'package:provider/provider.dart';
 
-class AddNote extends StatefulWidget {
+class AddNote extends ConsumerStatefulWidget {
   const AddNote({super.key, this.note, this.edit = false, this.noteIndex});
   final Note? note;
   final int? noteIndex;
   final bool edit;
 
   @override
-  State<AddNote> createState() => _AddNoteState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _AddNoteState();
 }
 
-class _AddNoteState extends OperationRunnerState<AddNote> {
+class _AddNoteState extends ConsumerState<AddNote> {
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
-  late NoteViewModel _noteViewModel;
 
   String? title;
   String? content;
@@ -39,8 +37,6 @@ class _AddNoteState extends OperationRunnerState<AddNote> {
 
   @override
   Widget build(BuildContext context) {
-    _noteViewModel = context.read<NoteViewModel>();
-
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -213,29 +209,22 @@ class _AddNoteState extends OperationRunnerState<AddNote> {
     required String title,
     required String content,
   }) async {
-    const operation = 'save note';
-
-    await runOperation<void>(
-      operation,
-      () async {
-        if (isEditing && widget.note != null) {
-          _noteViewModel.updateNote(
-              widget.noteIndex!,
-              Note(
-                docId: widget.note!.docId,
-                title: title,
-                content: content,
-                colorCode: widget.note!.colorCode,
-              ));
-          return;
-        }
-        _noteViewModel.saveNote(
+    if (isEditing && widget.note != null) {
+      ref.read(noteViewModel.notifier).updateNote(
+          widget.noteIndex!,
+          Note(
+            docId: widget.note!.docId,
+            title: title,
+            content: content,
+            colorCode: widget.note!.colorCode,
+          ));
+      return;
+    }
+    ref.read(noteViewModel.notifier).saveNote(
           title,
           content,
         );
 
-        Navigator.pop(context);
-      },
-    );
+    Navigator.pop(context);
   }
 }

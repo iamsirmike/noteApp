@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
 import 'package:kngtakehome/core/viewmodels/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
 import 'package:kngtakehome/utils/mixins/did_build.dart';
-import 'package:kngtakehome/utils/operation_runner.dart';
 import 'package:kngtakehome/views/document/add_note.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
 import 'package:kngtakehome/views/home/widgets/empty_state.dart';
@@ -11,26 +11,24 @@ import 'package:kngtakehome/views/home/widgets/note_container.dart';
 import 'package:kngtakehome/views/home/widgets/swipe_to_delete_bg.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
 import 'package:kngtakehome/views/widgets/custom_textfield.dart';
-import 'package:provider/provider.dart';
 
-class MyHomePage extends StatefulWidget {
+class MyHomePage extends ConsumerStatefulWidget {
   const MyHomePage({
     super.key,
   });
 
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  ConsumerState<ConsumerStatefulWidget> createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends OperationRunnerState<MyHomePage> with DidBuild {
-  late NoteViewModel _noteViewModel;
+class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
   final _searchController = TextEditingController();
 
   bool showSearchBar = false;
 
   @override
   Widget build(BuildContext context) {
-    _noteViewModel = context.watch<NoteViewModel>();
+    final noteViewModelProvider = ref.watch(noteViewModel);
 
     return Scaffold(
       body: Column(
@@ -104,7 +102,7 @@ class _MyHomePageState extends OperationRunnerState<MyHomePage> with DidBuild {
             builder: (context, searchText, _) {
               final enteredText = searchText.text.trim();
 
-              List<Note> notes = _noteViewModel.notes;
+              List<Note> notes = noteViewModelProvider.notes;
 
               if (enteredText.isNotEmpty) {
                 final titleSearchResults = notes
@@ -168,7 +166,7 @@ class _MyHomePageState extends OperationRunnerState<MyHomePage> with DidBuild {
                         key: UniqueKey(),
                         onDismissed: (direction) {
                           // Remove the item from the data source (hive).
-                          _noteViewModel.deleteNote(index);
+                          ref.read(noteViewModel.notifier).deleteNote(index);
 
                           // Then show a snackbar.
                           ScaffoldMessenger.of(context).showSnackBar(
@@ -218,6 +216,6 @@ class _MyHomePageState extends OperationRunnerState<MyHomePage> with DidBuild {
 
   @override
   void didBuild(BuildContext context) async {
-    _noteViewModel.getNotes();
+    await ref.read(noteViewModel.notifier).getNotes();
   }
 }
