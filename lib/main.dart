@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kngtakehome/app.dart';
 import 'package:kngtakehome/core/models/note.dart';
@@ -11,7 +12,7 @@ void main() async {
 
   await loadConfigs();
 
-  runApp(const MyApp());
+  runApp(const ProviderScope(child: MyApp()));
 }
 
 Future<void> loadConfigs() async {
