@@ -1,5 +1,15 @@
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:kngtakehome/core/models/note.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
+
+part 'note_repository.g.dart';
+
+
+//expose the repo class using riverpod
+@riverpod
+NoteRepositoryImpl noteRepositoryImpl(NoteRepositoryImplRef ref) {
+  return NoteRepositoryImpl();
+}
 
 abstract class NoteRepository {
   Future<void> saveNote({required List<Note> notes});
