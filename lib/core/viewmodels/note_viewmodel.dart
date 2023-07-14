@@ -1,30 +1,40 @@
 import 'dart:math';
 
-import 'package:flutter/material.dart';
-import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
 import 'package:kngtakehome/core/repository/note_repository.dart';
+import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class NoteViewModel extends ChangeNotifier {
+class NoteViewModel extends AsyncNotifier {
   NoteViewModel({required NoteRepositoryImpl noteRepositoryImpl})
       : _noteRepositoryImpl = noteRepositoryImpl;
 
   final NoteRepositoryImpl _noteRepositoryImpl;
 
-  List<Note> _notes = [];
-  List<Note> get notes => _notes;
+  @override
+  FutureOr<List<Note>> build() async {
+    return getNotes();
+  }
+
+  Future<List<Note>> getNotes() async {
+    final data = await _noteRepositoryImpl.getNotes();
+    return data;
+  }
 
   Future<void> saveNote(String title, String content) async {
-    await getNotes();
+    state = const AsyncValue.loading();
+
+    final notes = await getNotes();
+
+    // final notes = await getNotes(getNotesRef);
 
     //sort the list (descending)
-    _notes.sort((a, b) => b.docId.compareTo(a.docId));
+    notes.sort((a, b) => b.docId.compareTo(a.docId));
 
     //insert new note on top of the list
-    _notes.insert(
+    notes.insert(
       0,
       Note(
-        docId: _notes.isEmpty ? 1 : _notes.first.docId + 1,
+        docId: notes.isEmpty ? 1 : notes.first.docId + 1,
         //generate random colors
         colorCode: Random().nextInt(0xffffffff),
         title: title,
@@ -32,37 +42,42 @@ class NoteViewModel extends ChangeNotifier {
       ),
     );
 
-    await _noteRepositoryImpl.saveNote(notes: _notes);
-  }
-
-  Future<void> updateNote(int index, Note note) async {
-    await _noteRepositoryImpl.updateNote(
-        notes: _notes, index: index, note: note);
-
-    await _noteRepositoryImpl.saveNote(notes: _notes);
-
-    //refresh notes list
-    await getNotes();
-  }
-
-  Future<void> getNotes() async {
-    final data = await _noteRepositoryImpl.getNotes();
-    data.sort((a, b) => b.docId.compareTo(a.docId));
-    _notes = data;
-    notifyListeners();
+    state = await AsyncValue.guard(() async {
+      await _noteRepositoryImpl.saveNote(notes: notes);
+      return getNotes();
+    });
   }
 
   Future<void> deleteNote(int index) async {
-    await _noteRepositoryImpl.deleteNote(index);
+    state = const AsyncValue.loading();
 
-    //refresh list
-    await getNotes();
+    state = await AsyncValue.guard(() async {
+      await _noteRepositoryImpl.deleteNote(index);
+      //refresh list
+      return await getNotes();
+    });
+  }
+
+  Future<void> updateNote(int index, Note note) async {
+    final notes = await getNotes();
+
+    state = const AsyncValue.loading();
+
+    state = await AsyncValue.guard(() async {
+      await _noteRepositoryImpl.updateNote(
+          notes: notes, index: index, note: note);
+
+      await _noteRepositoryImpl.saveNote(notes: notes);
+
+      //refresh notes list
+      return getNotes();
+    });
   }
 }
 
-
-final noteViewModel = ChangeNotifierProvider<NoteViewModel>((ref) {
+final noteViewModelProvider = AsyncNotifierProvider(() {
+  NoteRepositoryImpl noteRepositoryImpl = NoteRepositoryImpl();
   return NoteViewModel(
-    noteRepositoryImpl: ref.read(noteRepositoryImplProvider),
+    noteRepositoryImpl: noteRepositoryImpl,
   );
 });

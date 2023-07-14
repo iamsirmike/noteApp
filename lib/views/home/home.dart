@@ -28,7 +28,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
 
   @override
   Widget build(BuildContext context) {
-    final noteViewModelProvider = ref.watch(noteViewModel);
+    final listOfNotes = ref.watch(noteViewModelProvider);
 
     return Scaffold(
       body: Column(
@@ -97,99 +97,108 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
               ),
             )
           ],
-          ValueListenableBuilder<TextEditingValue>(
-            valueListenable: _searchController,
-            builder: (context, searchText, _) {
-              final enteredText = searchText.text.trim();
+          Builder(builder: (context) {
+            return listOfNotes.when(
+                data: (listOfNotes) {
+                  return ValueListenableBuilder<TextEditingValue>(
+                    valueListenable: _searchController,
+                    builder: (context, searchText, _) {
+                      final enteredText = searchText.text.trim();
 
-              List<Note> notes = noteViewModelProvider.notes;
+                      List<Note> notes = listOfNotes;
 
-              if (enteredText.isNotEmpty) {
-                final titleSearchResults = notes
-                    .where((element) => element.title
-                        .toLowerCase()
-                        .contains(enteredText.toLowerCase()))
-                    .toList();
+                      if (enteredText.isNotEmpty) {
+                        final titleSearchResults = notes
+                            .where((element) => element.title
+                                .toLowerCase()
+                                .contains(enteredText.toLowerCase()))
+                            .toList();
 
-                final contentSearchResults = notes
-                    .where((element) => element.content
-                        .toLowerCase()
-                        .contains(enteredText.toLowerCase()))
-                    .toList();
+                        final contentSearchResults = notes
+                            .where((element) => element.content
+                                .toLowerCase()
+                                .contains(enteredText.toLowerCase()))
+                            .toList();
 
-                //conbine the search results using spread operator
-                final combinedResults = [
-                  ...titleSearchResults,
-                  ...contentSearchResults
-                ];
+                        //conbine the search results using spread operator
+                        final combinedResults = [
+                          ...titleSearchResults,
+                          ...contentSearchResults
+                        ];
 
-                //Remove duplicates fron the combined search results and assign it to notes
-                notes = combinedResults.toSet().toList();
-              }
+                        //Remove duplicates fron the combined search results and assign it to notes
+                        notes = combinedResults.toSet().toList();
+                      }
 
-              if (enteredText.isNotEmpty && notes.isEmpty) {
-                return const EmptyState(
-                  imagePath: "assets/cuate.png",
-                  description: "File not found. Try searching again.",
-                );
-              }
-
-              if (notes.isEmpty) {
-                return const EmptyState(
-                  imagePath: "assets/rafiki.png",
-                  description: "Create your first note!",
-                );
-              }
-              return Expanded(
-                child: ListView.separated(
-                  padding: EdgeInsets.zero,
-                  itemCount: notes.length,
-                  separatorBuilder: (context, index) => const SizedBox(
-                    height: 25,
-                  ),
-                  itemBuilder: (context, index) {
-                    final note = notes[index];
-                    return GestureDetector(
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => AddNote(
-                              note: note,
-                              noteIndex: index,
-                              edit: false,
-                            ),
-                          ),
+                      if (enteredText.isNotEmpty && notes.isEmpty) {
+                        return const EmptyState(
+                          imagePath: "assets/cuate.png",
+                          description: "File not found. Try searching again.",
                         );
-                      },
-                      child: Dismissible(
-                        key: UniqueKey(),
-                        onDismissed: (direction) {
-                          // Remove the item from the data source (hive).
-                          ref.read(noteViewModel.notifier).deleteNote(index);
+                      }
 
-                          // Then show a snackbar.
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                'note deleted',
+                      if (notes.isEmpty) {
+                        return const EmptyState(
+                          imagePath: "assets/rafiki.png",
+                          description: "Create your first note!",
+                        );
+                      }
+                      return Expanded(
+                        child: ListView.separated(
+                          padding: EdgeInsets.zero,
+                          itemCount: notes.length,
+                          separatorBuilder: (context, index) => const SizedBox(
+                            height: 25,
+                          ),
+                          itemBuilder: (context, index) {
+                            final note = notes[index];
+                            return GestureDetector(
+                              onTap: () {
+                                Navigator.push(
+                                  context,
+                                  MaterialPageRoute(
+                                    builder: (context) => AddNote(
+                                      note: note,
+                                      noteIndex: index,
+                                      edit: false,
+                                    ),
+                                  ),
+                                );
+                              },
+                              child: Dismissible(
+                                key: UniqueKey(),
+                                onDismissed: (direction) {
+                                  // Remove the item from the data source (hive).
+                                  ref
+                                      .read(noteViewModelProvider.notifier)
+                                      .deleteNote(index);
+
+                                  // Then show a snackbar.
+                                  ScaffoldMessenger.of(context).showSnackBar(
+                                    const SnackBar(
+                                      content: Text(
+                                        'note deleted',
+                                      ),
+                                    ),
+                                  );
+                                },
+                                background: const SwipeToDeleteBackground(),
+                                child: NoteContainer(
+                                  key: const Key('noteContainer'),
+                                  title: note.title,
+                                  colorCode: note.colorCode,
+                                ),
                               ),
-                            ),
-                          );
-                        },
-                        background: const SwipeToDeleteBackground(),
-                        child: NoteContainer(
-                          key: const Key('noteContainer'),
-                          title: note.title,
-                          colorCode: note.colorCode,
+                            );
+                          },
                         ),
-                      ),
-                    );
-                  },
-                ),
-              );
-            },
-          ),
+                      );
+                    },
+                  );
+                },
+                error: (err, stack) => Text('Error: $err'),
+                loading: () => const CircularProgressIndicator());
+          }),
           const SizedBox(
             height: 25,
           ),
@@ -216,6 +225,6 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
 
   @override
   void didBuild(BuildContext context) async {
-    await ref.read(noteViewModel.notifier).getNotes();
+    // await ref.watch(noteViewModelProvider.notifier).getNotes();
   }
 }

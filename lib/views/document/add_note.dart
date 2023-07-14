@@ -210,7 +210,7 @@ class _AddNoteState extends ConsumerState<AddNote> {
     required String content,
   }) async {
     if (isEditing && widget.note != null) {
-      ref.read(noteViewModel.notifier).updateNote(
+      ref.read(noteViewModelProvider.notifier).updateNote(
           widget.noteIndex!,
           Note(
             docId: widget.note!.docId,
@@ -220,10 +220,7 @@ class _AddNoteState extends ConsumerState<AddNote> {
           ));
       return;
     }
-    ref.read(noteViewModel.notifier).saveNote(
-          title,
-          content,
-        );
+    await ref.read(noteViewModelProvider.notifier).saveNote(title, content);
 
     Navigator.pop(context);
   }
