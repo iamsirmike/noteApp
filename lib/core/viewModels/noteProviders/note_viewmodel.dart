@@ -4,23 +4,23 @@ import 'package:kngtakehome/core/models/note.dart';
 import 'package:kngtakehome/core/repository/note_repository.dart';
 import 'package:riverpod_annotation/riverpod_annotation.dart';
 
-class NoteViewModel extends AsyncNotifier {
-  NoteViewModel({required NoteRepositoryImpl noteRepositoryImpl})
-      : _noteRepositoryImpl = noteRepositoryImpl;
+part 'note_viewmodel.g.dart';
 
-  final NoteRepositoryImpl _noteRepositoryImpl;
-
+@riverpod
+class NoteViewModel extends _$NoteViewModel {
   @override
   FutureOr<List<Note>> build() async {
     return getNotes();
   }
 
   Future<List<Note>> getNotes() async {
-    final data = await _noteRepositoryImpl.getNotes();
+    final noteRepositoryImpl = ref.read(noteRepositoryImplProvider);
+    final data = await noteRepositoryImpl.getNotes();
     return data;
   }
 
   Future<void> saveNote(String title, String content) async {
+    final noteRepositoryImpl = ref.read(noteRepositoryImplProvider);
     state = const AsyncValue.loading();
 
     final notes = await getNotes();
@@ -43,31 +43,35 @@ class NoteViewModel extends AsyncNotifier {
     );
 
     state = await AsyncValue.guard(() async {
-      await _noteRepositoryImpl.saveNote(notes: notes);
+      await noteRepositoryImpl.saveNote(notes: notes);
       return getNotes();
     });
   }
 
   Future<void> deleteNote(int index) async {
+    final noteRepositoryImpl = ref.read(noteRepositoryImplProvider);
+
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
-      await _noteRepositoryImpl.deleteNote(index);
+      await noteRepositoryImpl.deleteNote(index);
       //refresh list
       return await getNotes();
     });
   }
 
   Future<void> updateNote(int index, Note note) async {
+    final noteRepositoryImpl = ref.read(noteRepositoryImplProvider);
+
     final notes = await getNotes();
 
     state = const AsyncValue.loading();
 
     state = await AsyncValue.guard(() async {
-      await _noteRepositoryImpl.updateNote(
+      await noteRepositoryImpl.updateNote(
           notes: notes, index: index, note: note);
 
-      await _noteRepositoryImpl.saveNote(notes: notes);
+      await noteRepositoryImpl.saveNote(notes: notes);
 
       //refresh notes list
       return getNotes();
@@ -75,9 +79,9 @@ class NoteViewModel extends AsyncNotifier {
   }
 }
 
-final noteViewModelProvider = AsyncNotifierProvider(() {
-  NoteRepositoryImpl noteRepositoryImpl = NoteRepositoryImpl();
-  return NoteViewModel(
-    noteRepositoryImpl: noteRepositoryImpl,
-  );
-});
+
+//USE THIS TO CREATE A PROVIDER IF WE DON'T USE CODE GENERATION
+// final noteViewModelProvider =
+//     AsyncNotifierProvider<AsyncNoteViewModel, List<Note>>(() {
+//   return AsyncNoteViewModel();
+// });

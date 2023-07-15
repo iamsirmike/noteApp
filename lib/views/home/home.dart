@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
-import 'package:kngtakehome/core/viewmodels/note_viewmodel.dart';
+import 'package:kngtakehome/core/viewmodels/noteProviders/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
 import 'package:kngtakehome/utils/mixins/did_build.dart';
 import 'package:kngtakehome/views/document/add_note.dart';

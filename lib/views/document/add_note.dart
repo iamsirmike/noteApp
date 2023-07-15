@@ -3,7 +3,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
-import 'package:kngtakehome/core/viewmodels/note_viewmodel.dart';
+import 'package:kngtakehome/core/viewModels/toggleEditViewModel.dart/toggle_eidt_note_viewmodel.dart';
+import 'package:kngtakehome/core/viewmodels/noteProviders/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
@@ -26,17 +27,19 @@ class _AddNoteState extends ConsumerState<AddNote> {
   String? title;
   String? content;
 
-  bool isEditing = false;
   bool userHasSavedNote = false;
 
   @override
   void initState() {
     super.initState();
-    isEditing = widget.edit;
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      ref.read(editingViewModelProvider.notifier).toggleEditing(widget.edit);
+    });
   }
 
   @override
   Widget build(BuildContext context) {
+    final isEditing = ref.watch(editingViewModelProvider);
     return Scaffold(
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -64,12 +67,17 @@ class _AddNoteState extends ConsumerState<AddNote> {
                     Navigator.pop(context);
                   }
 
+                  setState(() {
+                    userHasSavedNote = shouldSave;
+                  });
+
                   if (!_formKey.currentState!.validate()) {
                     return;
                   }
                   _formKey.currentState!.save();
 
-                  saveNote(title: title!, content: content!);
+                  saveNote(
+                      title: title!, content: content!, isEditing: isEditing);
                   // Navigator.pop(context);
                 },
               ),
@@ -110,7 +118,10 @@ class _AddNoteState extends ConsumerState<AddNote> {
                             }
                             _formKey.currentState!.save();
 
-                            saveNote(title: title!, content: content!);
+                            saveNote(
+                                title: title!,
+                                content: content!,
+                                isEditing: isEditing);
                           },
                         )
                       ],
@@ -119,9 +130,9 @@ class _AddNoteState extends ConsumerState<AddNote> {
                       key: const Key('editIcon'),
                       icon: Icons.edit,
                       onTap: () {
-                        setState(() {
-                          isEditing = true;
-                        });
+                        ref
+                            .read(editingViewModelProvider.notifier)
+                            .toggleEditing(true);
                       },
                     )
             ],
@@ -208,6 +219,7 @@ class _AddNoteState extends ConsumerState<AddNote> {
   void saveNote({
     required String title,
     required String content,
+    required bool isEditing,
   }) async {
     if (isEditing && widget.note != null) {
       ref.read(noteViewModelProvider.notifier).updateNote(
