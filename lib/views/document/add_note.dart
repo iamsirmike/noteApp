@@ -66,7 +66,12 @@ class _AddNoteState extends OperationRunnerState<AddNote> {
                   );
                   if (!shouldSave) {
                     Navigator.pop(context);
+                    return;
                   }
+
+                   setState(() {
+                              userHasSavedNote = shouldSave;
+                            });
 
                   if (!_formKey.currentState!.validate()) {
                     return;
