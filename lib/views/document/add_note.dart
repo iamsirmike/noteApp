@@ -65,6 +65,7 @@ class _AddNoteState extends ConsumerState<AddNote> {
                   );
                   if (!shouldSave) {
                     Navigator.pop(context);
+                    return;
                   }
 
                   setState(() {
