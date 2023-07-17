@@ -3,7 +3,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
-import 'package:kngtakehome/core/viewModels/toggleEditViewModel.dart/toggle_eidt_note_viewmodel.dart';
+import 'package:kngtakehome/core/viewModels/toggleEditViewModel/toggle_eidt_note_viewmodel.dart';
 import 'package:kngtakehome/core/viewmodels/noteProviders/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';

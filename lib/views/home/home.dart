@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:kngtakehome/core/models/note.dart';
+import 'package:kngtakehome/core/viewModels/toggleSearchViewModel/toggle_search_viewmodel.dart';
 import 'package:kngtakehome/core/viewmodels/noteProviders/note_viewmodel.dart';
 import 'package:kngtakehome/utils/colors.dart';
-import 'package:kngtakehome/utils/mixins/did_build.dart';
 import 'package:kngtakehome/views/document/add_note.dart';
 import 'package:kngtakehome/views/home/widgets/app_bar_button.dart';
 import 'package:kngtakehome/views/home/widgets/empty_state.dart';
@@ -12,23 +12,17 @@ import 'package:kngtakehome/views/home/widgets/swipe_to_delete_bg.dart';
 import 'package:kngtakehome/views/widgets/app_bar.dart';
 import 'package:kngtakehome/views/widgets/custom_textfield.dart';
 
-class MyHomePage extends ConsumerStatefulWidget {
+class MyHomePage extends ConsumerWidget {
   const MyHomePage({
     super.key,
   });
 
   @override
-  ConsumerState<ConsumerStatefulWidget> createState() => _MyHomePageState();
-}
+  Widget build(BuildContext context, WidgetRef ref) {
+    final searchController = TextEditingController();
 
-class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
-  final _searchController = TextEditingController();
-
-  bool showSearchBar = false;
-
-  @override
-  Widget build(BuildContext context) {
     final listOfNotes = ref.watch(noteViewModelProvider);
+    final showSearchBar = ref.watch(toggleSearchProvider);
 
     return Scaffold(
       body: Column(
@@ -37,7 +31,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
             Padding(
                 padding: const EdgeInsets.fromLTRB(16, 60, 16, 16),
                 child: CustomTextField(
-                  controller: _searchController,
+                  controller: searchController,
                   hint: 'Search by the keyword...',
                   filled: true,
                   textStyle: TextStyle(
@@ -52,10 +46,10 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
                   ),
                   suffixIcon: GestureDetector(
                     onTap: () {
-                      setState(() {
-                        showSearchBar = false;
-                        _searchController.clear();
-                      });
+                      ref
+                          .read(toggleSearchProvider.notifier)
+                          .toggleSearch(false);
+                      searchController.clear();
                     },
                     child: const Icon(
                       Icons.close,
@@ -80,9 +74,9 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
                     key: const Key('searchButton'),
                     icon: Icons.search,
                     onTap: () {
-                      setState(() {
-                        showSearchBar = true;
-                      });
+                      ref
+                          .read(toggleSearchProvider.notifier)
+                          .toggleSearch(true);
                     },
                   ),
                   const SizedBox(
@@ -101,7 +95,7 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
             return listOfNotes.when(
                 data: (listOfNotes) {
                   return ValueListenableBuilder<TextEditingValue>(
-                    valueListenable: _searchController,
+                    valueListenable: searchController,
                     builder: (context, searchText, _) {
                       final enteredText = searchText.text.trim();
 
@@ -221,10 +215,5 @@ class _MyHomePageState extends ConsumerState<MyHomePage> with DidBuild {
         child: const Icon(Icons.add),
       ), // This trailing comma makes auto-formatting nicer for build methods.
     );
-  }
-
-  @override
-  void didBuild(BuildContext context) async {
-    // await ref.watch(noteViewModelProvider.notifier).getNotes();
   }
 }
